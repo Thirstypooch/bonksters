@@ -1,4 +1,4 @@
-
+'use client';
 import React, { useState } from 'react';
 import { 
   Beef, Pizza, Fish, Salad, Coffee, ChevronRight, ChevronLeft 

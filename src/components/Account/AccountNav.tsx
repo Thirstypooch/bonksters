@@ -1,4 +1,4 @@
-
+'use client';
 import React from 'react';
 import { User, MapPin, CreditCard, ClipboardList, Settings } from 'lucide-react';
 import Link from 'next/link';

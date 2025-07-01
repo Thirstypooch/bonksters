@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowLeft, Star, Clock } from 'lucide-react';
+import Link from "next/link";
 
 interface RestaurantHeaderProps {
   name: string;
@@ -32,7 +32,7 @@ const RestaurantHeader: React.FC<RestaurantHeaderProps> = ({
       {/* Back Button */}
       <div className="absolute top-4 left-4">
         <Link
-          to="/"
+          href="/"
           className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white transition"
         >
           <ArrowLeft size={20} />

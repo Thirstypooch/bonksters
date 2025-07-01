@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from "next/link";
 
 type OrderStep = 'confirmed' | 'preparing' | 'on-the-way' | 'delivered';
 
@@ -39,7 +39,7 @@ const OrderStatus: React.FC<OrderStatusProps> = ({
     <div className="bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
       <div className="p-4 bg-gray-50 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center text-gray-600 hover:text-black">
+          <Link href="/" className="flex items-center text-gray-600 hover:text-black">
             <ArrowLeft size={18} className="mr-1" />
             <span>Back to Home</span>
           </Link>

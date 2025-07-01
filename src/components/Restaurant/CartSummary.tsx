@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
+import Link from "next/link";
 
 interface CartSummaryProps {
   itemCount: number;
@@ -24,7 +24,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ itemCount, total }) => {
         <div className="flex items-center gap-3">
           <span className="md:hidden font-bold">${total.toFixed(2)}</span>
           <Link
-            to="/cart"
+            href="/cart"
             className="bg-bonkster-orange text-white px-6 py-2 rounded-full font-bold hover:bg-bonkster-orange/90 transition"
           >
             View Cart

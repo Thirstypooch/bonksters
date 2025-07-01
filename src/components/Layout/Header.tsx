@@ -1,10 +1,10 @@
-
+'use client';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { MapPin, Search, ShoppingCart, User, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import Link from "next/link";
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
@@ -18,7 +18,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo + Location (left side) */}
           <div className="flex items-center gap-2">
-            <Link to="/" className="flex items-center">
+            <Link href="/" className="flex items-center">
               <div className="mr-2 relative">
                 <div className="h-10 w-10 bg-bonkster-orange rounded-full flex items-center justify-center">
                   <span className="font-display font-bold text-white text-lg">B</span>
@@ -29,7 +29,7 @@ const Header = () => {
               </div>
               {!isMobile && (
                 <div className="font-display font-bold text-lg leading-none">
-                  <span className="text-bonkster-orange">Bonkster's</span>
+                  <span className="text-bonkster-orange">Booster&#39;s</span>
                   <br />
                   <span className="text-bonkster-blue text-sm">Your Food Buddy</span>
                 </div>
@@ -62,12 +62,12 @@ const Header = () => {
             {!isMobile ? (
               <>
                 <Button variant="ghost" size="icon" asChild>
-                  <Link to="/account">
+                  <Link href="/account">
                     <User size={20} />
                   </Link>
                 </Button>
                 <Button variant="ghost" size="icon" className="relative" asChild>
-                  <Link to="/cart">
+                  <Link href="/cart">
                     <ShoppingCart size={20} />
                     {cartItemCount > 0 && (
                       <span className="absolute -top-1 -right-1 bg-bonkster-orange text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
@@ -93,20 +93,20 @@ const Header = () => {
                     
                     <div className="space-y-3">
                       <Link 
-                        to="/"
+                        href="/"
                         className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md"
                       >
                         Home
                       </Link>
                       <Link 
-                        to="/account"
+                        href="/account"
                         className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md"
                       >
                         <User size={18} />
                         My Account
                       </Link>
                       <Link 
-                        to="/cart"
+                        href="/cart"
                         className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md"
                       >
                         <ShoppingCart size={18} />

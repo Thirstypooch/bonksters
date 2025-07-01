@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { CalendarIcon, ClockIcon, ArrowRightIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from "next/link";
 
 // Mock data
 const orders = [
@@ -111,7 +111,7 @@ const Orders = () => {
                   Reorder
                 </Button>
                 <Button size="sm" variant="ghost" asChild>
-                  <Link to={`/orders/${order.id}`} className="flex items-center gap-1">
+                  <Link href={`/orders/${order.id}`} className="flex items-center gap-1">
                     Details
                     <ArrowRightIcon size={14} />
                   </Link>

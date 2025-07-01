@@ -1,12 +1,12 @@
-
+'use client';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Home, CreditCard, Check } from 'lucide-react';
-import MainLayout from '@/components/Layout/MainLayout';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Home, CreditCard } from 'lucide-react';
 import CartItem, { CartItemType } from '@/components/Cart/CartItem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import Link from "next/link";
 
 // Mock cart data
 const initialCartItems: CartItemType[] = [
@@ -29,46 +29,46 @@ const initialCartItems: CartItemType[] = [
 ];
 
 const Cart = () => {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItemType[]>(initialCartItems);
   const [promoCode, setPromoCode] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  
+
   const handleUpdateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) return;
-    
-    setCartItems(items => 
-      items.map(item => 
+
+    setCartItems(items =>
+      items.map(item =>
         item.id === id ? { ...item, quantity } : item
       )
     );
   };
-  
+
   const handleRemoveItem = (id: string) => {
     setCartItems(items => items.filter(item => item.id !== id));
   };
-  
+
   // Calculate order summary
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + (item.price * item.quantity), 
+    (sum, item) => sum + (item.price * item.quantity),
     0
   );
   const deliveryFee = 3.99;
   const tax = subtotal * 0.08; // 8% tax
   const total = subtotal + deliveryFee + tax;
-  
+
   return (
-    <MainLayout>
+    <>
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <div className="mb-6 mt-2">
-          <Link 
-            to={-1 as any} 
+          <button onClick={() => router.back()}
             className="text-gray-600 hover:text-gray-900 flex items-center gap-1"
           >
             <ArrowLeft size={18} />
             <span>Back to Restaurant</span>
-          </Link>
+          </button>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
@@ -76,7 +76,7 @@ const Cart = () => {
               <div className="p-4 bg-gray-50 border-b border-gray-200">
                 <h2 className="font-bold text-xl">Cart Items</h2>
               </div>
-              
+
               {cartItems.length > 0 ? (
                 <div>
                   {cartItems.map(item => (
@@ -87,14 +87,14 @@ const Cart = () => {
                       onRemove={handleRemoveItem}
                     />
                   ))}
-                  
+
                   <div className="p-4">
-                    <Button 
+                    <Button
                       variant="outline"
                       className="w-full"
                       asChild
                     >
-                      <Link to="/restaurant/1">
+                      <Link href="/restaurant/1">
                         + Add More Items
                       </Link>
                     </Button>
@@ -104,20 +104,20 @@ const Cart = () => {
                 <div className="p-8 text-center">
                   <p className="text-gray-500 mb-4">Your cart is empty</p>
                   <Button asChild>
-                    <Link to="/">Browse Restaurants</Link>
+                    <Link href="/">Browse Restaurants</Link>
                   </Button>
                 </div>
               )}
             </div>
           </div>
-          
+
           {/* Order Summary */}
           <div>
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden sticky top-20">
               <div className="p-4 bg-gray-50 border-b border-gray-200">
                 <h2 className="font-bold text-xl">Order Summary</h2>
               </div>
-              
+
               <div className="p-4">
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between">
@@ -137,7 +137,7 @@ const Cart = () => {
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
-                
+
                 <div className="mb-4">
                   <div className="flex gap-2 mb-2">
                     <Input
@@ -149,7 +149,7 @@ const Cart = () => {
                     <Button variant="outline" className="whitespace-nowrap">Apply</Button>
                   </div>
                 </div>
-                
+
                 <div className="mb-4">
                   <h3 className="font-bold mb-2">Delivery Address</h3>
                   <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md mb-2">
@@ -163,7 +163,7 @@ const Cart = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="mb-4">
                   <h3 className="font-bold mb-2">Payment Method</h3>
                   <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md mb-2">
@@ -176,27 +176,27 @@ const Cart = () => {
                     Use PayPal
                   </Button>
                 </div>
-                
+
                 <div className="mb-4 flex items-center gap-2">
-                  <Checkbox 
-                    id="terms" 
-                    checked={agreedToTerms} 
-                    onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} 
+                  <Checkbox
+                    id="terms"
+                    checked={agreedToTerms}
+                    onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
                   />
-                  <label 
-                    htmlFor="terms" 
+                  <label
+                    htmlFor="terms"
                     className="text-sm text-gray-600"
                   >
                     I agree to terms and conditions
                   </label>
                 </div>
-                
-                <Button 
+
+                <Button
                   className="w-full bg-bonkster-orange hover:bg-bonkster-orange/90"
                   disabled={!agreedToTerms || cartItems.length === 0}
                   asChild
                 >
-                  <Link to="/tracking">
+                  <Link href="/tracking">
                     Place Order →
                   </Link>
                 </Button>
@@ -205,7 +205,7 @@ const Cart = () => {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

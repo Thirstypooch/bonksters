@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import MainLayout from '@/components/Layout/MainLayout';
 import RestaurantHeader from '@/components/Restaurant/RestaurantHeader';
@@ -103,7 +104,7 @@ const RestaurantPage = ({ params }: { params: { id: string } }) => {
     const cartTotal = cartItems.reduce((total, item) => total + item.price, 0);
 
     return (
-        <MainLayout>
+        <>
             <RestaurantHeader {...restaurantData} />
 
             <div className="container mx-auto px-4 py-6">
@@ -153,7 +154,7 @@ const RestaurantPage = ({ params }: { params: { id: string } }) => {
 
             {/* Add padding to avoid content being covered by the cart summary */}
             {cartItemCount > 0 && <div className="h-16"></div>}
-        </MainLayout>
+        </>
     );
 };
 
