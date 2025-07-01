@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { User, MapPin, CreditCard, ClipboardList, Settings } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const navItems = [
   { 
@@ -32,7 +33,7 @@ const navItems = [
 ];
 
 const AccountNav = () => {
-  const location = useLocation();
+  const pathname = usePathname();
   
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -42,12 +43,12 @@ const AccountNav = () => {
       <nav className="p-2">
         <ul className="space-y-1">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = pathname === item.path;
             
             return (
               <li key={item.path}>
                 <Link
-                  to={item.path}
+                  href={item.path}
                   className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
                     isActive 
                       ? 'bg-bonkster-orange text-white' 

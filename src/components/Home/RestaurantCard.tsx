@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Star, Clock } from 'lucide-react';
 
 interface RestaurantCardProps {
@@ -21,7 +21,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
   deliveryFee,
 }) => {
   return (
-    <Link to={`/restaurant/${id}`} className="block group">
+    <Link href={`/restaurant/${id}`} className="block group">
       <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 transition-all hover:shadow-md">
         <div className="h-36 overflow-hidden">
           <img 

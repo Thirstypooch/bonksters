@@ -1,5 +1,4 @@
 import React from 'react';
-import MainLayout from '@/components/Layout/MainLayout';
 import HeroBanner from '@/components/Home/HeroBanner';
 import CategoryScroller from '@/components/Home/CategoryScroller';
 import RestaurantCard from '@/components/Home/RestaurantCard';
@@ -60,7 +59,6 @@ const restaurantData = [
 
 const Index = () => {
   return (
-    <MainLayout>
       <div className="container mx-auto px-4 py-6">
         <HeroBanner />
         
@@ -82,7 +80,6 @@ const Index = () => {
         
         <TrendingSection />
       </div>
-    </MainLayout>
   );
 };
 
