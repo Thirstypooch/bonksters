@@ -1,20 +1,10 @@
 'use client'
 import React from 'react';
-import MainLayout from '@/components/Layout/MainLayout';
 import RestaurantHeader from '@/components/Restaurant/RestaurantHeader';
 import MenuCategory from '@/components/Restaurant/MenuCategory';
 import CartSummary from '@/components/Restaurant/CartSummary';
-import { MenuItemType } from '@/components/Restaurant/MenuItem';
-
-// Mock data
-const restaurantData = {
-    id: '1',
-    name: 'Burger Joint',
-    coverImage: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1000&h=400&fit=crop',
-    rating: 4.5,
-    deliveryTime: '30-40 min',
-    deliveryFee: '3.99',
-};
+import { trpc } from '@/lib/trpc/client'; // Import tRPC
+import { Skeleton } from '@/components/ui/skeleton';
 
 const menuCategories = [
     {
@@ -95,17 +85,37 @@ const menuCategories = [
 
 const RestaurantPage = ({ params }: { params: { id: string } }) => {
     const { id } = params;
-    const [cartItems, setCartItems] = React.useState<MenuItemType[]>([]);
+    const { data: restaurant, isLoading, isError } = trpc.restaurant.getRestaurantById.useQuery({ id });
+    const cartItemCount = 0;
+    const cartTotal = 0;
 
-    // Note: In a real app, you would fetch the restaurant data based on the ID
-
-    // Calculate cart totals
-    const cartItemCount = cartItems.length;
-    const cartTotal = cartItems.reduce((total, item) => total + item.price, 0);
+    if (isLoading) {
+        return (
+            <div className="container mx-auto p-6">
+                <Skeleton className="h-64 w-full mb-4" />
+                <Skeleton className="h-10 w-1/2" />
+            </div>
+        );
+    }
+    if (isError || !restaurant) {
+        return <div className="container mx-auto p-6 text-center text-red-500">Restaurant not found or failed to load.</div>;
+    }
 
     return (
         <>
-            <RestaurantHeader {...restaurantData} />
+            <RestaurantHeader
+                name={restaurant.name}
+                coverImage={restaurant.coverImageUrl || 'https://placehold.co/1000x400/f97316/white?text=Food'}
+                rating={Number(restaurant.rating) || 0}
+                deliveryTime={`${restaurant.deliveryTimeMinutes || 'N/A'} min`}
+                deliveryFee={
+                    restaurant.deliveryFeeCents === null || restaurant.deliveryFeeCents === undefined
+                        ? 'N/A'
+                        : restaurant.deliveryFeeCents === 0
+                            ? 'Free'
+                            : (restaurant.deliveryFeeCents / 100).toFixed(2)
+                }
+            />
 
             <div className="container mx-auto px-4 py-6">
                 <div className="flex flex-col md:flex-row gap-6">

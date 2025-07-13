@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Poppins, Nunito } from "next/font/google"; // We'll use the fonts from your tailwind.config.ts
+import { Poppins, Nunito } from "next/font/google"; // We'll use the fonts from your tailwind.config.ts
 import "./globals.css";
 import Header from "@/components/Layout/Header";
 import Footer from "@/components/Layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import TRPCProvider from '@/lib/trpc/Provider';
 
 // Setup the fonts based on your tailwind.config.ts
 const nunito = Nunito({
@@ -35,6 +36,7 @@ export default function RootLayout({
     <html lang="en">
       {/* Apply the font variables to the body tag */}
       <body className={`${nunito.variable} ${poppins.variable} font-sans`}>
+      <TRPCProvider>
         <TooltipProvider>
           <Toaster />
           <div className="flex flex-col min-h-screen">
@@ -43,6 +45,7 @@ export default function RootLayout({
             <Footer />
           </div>
         </TooltipProvider>
+      </TRPCProvider>
       </body>
     </html>
   );
