@@ -2,59 +2,23 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Home, CreditCard } from 'lucide-react';
-import CartItem, { CartItemType } from '@/components/Cart/CartItem';
+import CartItem from '@/components/Cart/CartItem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from "next/link";
+import { useCartStore } from '@/lib/store/cart';
 
-// Mock cart data
-const initialCartItems: CartItemType[] = [
-  {
-    id: '1',
-    name: 'Classic Burger',
-    customizations: ['Extra cheese', 'Spicy level: Medium'],
-    quantity: 2,
-    price: 12.00,
-    imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300',
-  },
-  {
-    id: '2',
-    name: 'Loaded Fries',
-    customizations: ['No onions'],
-    quantity: 1,
-    price: 8.99,
-    imageUrl: 'https://images.unsplash.com/photo-1576021522997-9e5d5f924ee8?w=300',
-  },
-];
 
 const Cart = () => {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItemType[]>(initialCartItems);
+  const { items, removeItem, updateQuantity } = useCartStore();
   const [promoCode, setPromoCode] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) return;
-
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleRemoveItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
-
-  // Calculate order summary
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + (item.price * item.quantity),
-    0
-  );
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const deliveryFee = 3.99;
-  const tax = subtotal * 0.08; // 8% tax
+  const tax = subtotal * 0.08;
   const total = subtotal + deliveryFee + tax;
 
   return (
@@ -74,17 +38,17 @@ const Cart = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
               <div className="p-4 bg-gray-50 border-b border-gray-200">
-                <h2 className="font-bold text-xl">Cart Items</h2>
+                <h2 className="font-bold text-xl">Cart Items ({items.length})</h2>
               </div>
 
-              {cartItems.length > 0 ? (
+              {items.length > 0 ? (
                 <div>
-                  {cartItems.map(item => (
+                  {items.map(item => (
                     <CartItem
                       key={item.id}
                       item={item}
-                      onUpdateQuantity={handleUpdateQuantity}
-                      onRemove={handleRemoveItem}
+                      onUpdateQuantity={updateQuantity}
+                      onRemove={removeItem}
                     />
                   ))}
 
@@ -193,7 +157,7 @@ const Cart = () => {
 
                 <Button
                   className="w-full bg-bonkster-orange hover:bg-bonkster-orange/90"
-                  disabled={!agreedToTerms || cartItems.length === 0}
+                  disabled={!agreedToTerms || items.length === 0}
                   asChild
                 >
                   <Link href="/tracking">
