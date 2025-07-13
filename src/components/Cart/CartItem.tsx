@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 export interface CartItemType {
   id: string;
   name: string;
-  customizations: string[];
+  customizations?: string[];
   quantity: number;
   price: number;
   imageUrl: string;
@@ -36,7 +36,7 @@ const CartItem: React.FC<CartItemProps> = ({
       <div className="flex-grow">
         <h4 className="font-medium mb-1">{item.name}</h4>
         
-        {item.customizations.length > 0 && (
+        {item.customizations && item.customizations.length > 0 && (
           <div className="mb-2">
             {item.customizations.map((customization, index) => (
               <div key={index} className="text-sm text-gray-600">
