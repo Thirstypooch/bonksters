@@ -1,28 +1,29 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from "next";
-import { Poppins, Nunito } from "next/font/google"; // We'll use the fonts from your tailwind.config.ts
+import { Poppins, Nunito } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Layout/Header";
 import Footer from "@/components/Layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import TRPCProvider from '@/lib/trpc/Provider';
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
-// Setup the fonts based on your tailwind.config.ts
 const nunito = Nunito({
   subsets: ["latin"],
   display: 'swap',
-  variable: '--font-nunito', // CSS Variable for Tailwind
+  variable: '--font-nunito',
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ['400', '500', '600', '700'],
   display: 'swap',
-  variable: '--font-poppins', // CSS Variable for Tailwind
+  variable: '--font-poppins',
 });
 
-// This is the metadata for your entire application (great for SEO)
 export const metadata: Metadata = {
   title: "Bonkster's Food Buddy",
   description: "Your friendly neighborhood food delivery app",
@@ -33,7 +34,27 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = createClient();
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookieStore.set(name, value, options);
+              });
+            } catch {
+              // This is expected to fail on Server Components, which is fine.
+            }
+          },
+        },
+      }
+  );
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -45,7 +66,7 @@ export default async function RootLayout({
         <TooltipProvider>
           <Toaster />
           <div className="flex flex-col min-h-screen">
-            <Header session={session} />
+            <Header session={session}  />
             <main className="flex-grow">{children}</main>
             <Footer />
           </div>

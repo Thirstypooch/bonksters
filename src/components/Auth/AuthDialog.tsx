@@ -1,8 +1,3 @@
-//  This component will use the Dialog from shadcn/ui and contain Tabs for switching between "Sign In" and "Sign Up".
-//  import the client. In your form's onSubmit handler, call supabase.auth.signInWithPassword(...) or supabase.auth.signUp(...).
-//
-// Use the toast function from sonner to provide feedback to the user (e.g., "Check your email to verify your account" or "Invalid credentials").
-
 'use client';
 
 import {
@@ -25,20 +20,21 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Authentication</DialogTitle>
+                    <DialogDescription>
+                        Sign in to your account or create a new one to continue.
+                    </DialogDescription>
+                </DialogHeader>
                 <Tabs defaultValue="sign-in" className="w-full">
-                    <DialogHeader className="mb-4">
-                        <DialogTitle className="text-center">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="sign-in">Sign In</TabsTrigger>
-                                <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
-                            </TabsList>
-                        </DialogTitle>
-                        <DialogDescription></DialogDescription>
-                    </DialogHeader>
-                    <TabsContent value="sign-in">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="sign-in">Sign In</TabsTrigger>
+                        <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="sign-in" className="mt-4">
                         <SignInForm />
                     </TabsContent>
-                    <TabsContent value="sign-up">
+                    <TabsContent value="sign-up" className="mt-4">
                         <SignUpForm />
                     </TabsContent>
                 </Tabs>

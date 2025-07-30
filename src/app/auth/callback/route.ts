@@ -1,11 +1,10 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
-    const { searchParams, origin } = new URL(request.url)
-    const code = searchParams.get('code')
-    // if "next" is in param, use it as the redirect URL
-    const next = searchParams.get('next') ?? '/'
+    const { searchParams, origin } = new URL(request.url);
+    const code = searchParams.get('code');
+    const next = searchParams.get('next') ?? '/';
 
     if (code) {
         const supabase = createServerClient(
@@ -13,46 +12,26 @@ export async function GET(request: NextRequest) {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             {
                 cookies: {
-                    get(name: string) {
-                        return request.cookies.get(name)?.value
+                    getAll() {
+                        return request.cookies.getAll();
                     },
-                    set(name: string, value: string, options: CookieOptions) {
-                        // If the cookie is updated, update the cookies for the request and response
-                        request.cookies.set({
-                            name,
-                            value,
-                            ...options,
-                        })
-                        const response = NextResponse.next()
-                        response.cookies.set({
-                            name,
-                            value,
-                            ...options,
-                        })
-                    },
-                    remove(name: string, options: CookieOptions) {
-                        // If the cookie is removed, update the cookies for the request and response
-                        request.cookies.set({
-                            name,
-                            value: '',
-                            ...options,
-                        })
-                        const response = NextResponse.next()
-                        response.cookies.set({
-                            name,
-                            value: '',
-                            ...options,
-                        })
+                    setAll(cookiesToSet) {
+                        cookiesToSet.forEach(({ name, value }) => {
+                            // The response object isn't available in route handlers,
+                            // so we set the cookies on the request object alone.
+                            request.cookies.set(name, value);
+                        });
                     },
                 },
             }
-        )
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        );
+
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {
-            return NextResponse.redirect(`${origin}${next}`)
+            return NextResponse.redirect(`${origin}${next}`);
         }
     }
 
     // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }
