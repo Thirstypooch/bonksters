@@ -6,6 +6,7 @@ import Footer from "@/components/Layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import TRPCProvider from '@/lib/trpc/Provider';
+import { createClient } from '@/lib/supabase/server';
 
 // Setup the fonts based on your tailwind.config.ts
 const nunito = Nunito({
@@ -27,11 +28,15 @@ export const metadata: Metadata = {
   description: "Your friendly neighborhood food delivery app",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return (
     <html lang="en">
       {/* Apply the font variables to the body tag */}
@@ -40,7 +45,7 @@ export default function RootLayout({
         <TooltipProvider>
           <Toaster />
           <div className="flex flex-col min-h-screen">
-            <Header />
+            <Header session={session} />
             <main className="flex-grow">{children}</main>
             <Footer />
           </div>
