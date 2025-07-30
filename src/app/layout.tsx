@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import type { Metadata } from "next";
+import React from "react";
 import { Poppins, Nunito } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Layout/Header";
@@ -56,8 +57,8 @@ export default async function RootLayout({
       }
   );
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
   return (
     <html lang="en">
       {/* Apply the font variables to the body tag */}
@@ -66,7 +67,7 @@ export default async function RootLayout({
         <TooltipProvider>
           <Toaster />
           <div className="flex flex-col min-h-screen">
-            <Header session={session}  />
+            <Header user={user}  />
             <main className="flex-grow">{children}</main>
             <Footer />
           </div>

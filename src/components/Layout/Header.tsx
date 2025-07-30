@@ -3,13 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MapPin, Search, ShoppingCart, User, Menu, LogOut } from 'lucide-react'; // Added LogOut import
-import { type Session } from '@supabase/supabase-js';
+import { MapPin, Search, ShoppingCart, User, Menu, LogOut } from 'lucide-react';
+import { type User as SupabaseUser } from '@supabase/supabase-js';
 import { toast } from 'sonner';
-
 import { useIsMobile } from '@/hooks/use-mobile';
 import { createClient } from '@/lib/supabase/client';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -18,17 +16,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AuthDialog from '../Auth/AuthDialog';
 
 interface HeaderProps {
-  session: Session | null;
+  user: SupabaseUser | null;
 }
 
-const Header = ({ session }: HeaderProps) => {
-  const [location, setLocation] = useState('Current Location');
+const Header = ({ user }: HeaderProps) => {
+  const [location] = useState('Current Location');
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const router = useRouter();
-  const cartItemCount = 0; // This would come from a cart context/state
-
-  const user = session?.user;
+  const cartItemCount = 0;
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -37,7 +33,6 @@ const Header = ({ session }: HeaderProps) => {
     toast.info('You have been signed out.');
   };
 
-  // Sub-component for the user dropdown menu on desktop
   const UserMenu = () => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -62,12 +57,10 @@ const Header = ({ session }: HeaderProps) => {
   );
 
   return (
-      // Use a React Fragment to return multiple top-level elements
       <>
         <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
           <div className="container mx-auto py-3 px-4">
             <div className="flex items-center justify-between">
-              {/* --- Logo + Location (left side) --- */}
               <div className="flex items-center gap-2">
                 <Link href="/" className="flex items-center">
                   <div className="mr-2 relative">
@@ -93,8 +86,6 @@ const Header = ({ session }: HeaderProps) => {
                     </div>
                 )}
               </div>
-
-              {/* --- Search bar (center - hidden on mobile) --- */}
               {!isMobile && (
                   <div className="flex-1 max-w-md mx-4">
                     <div className="relative">
@@ -107,18 +98,14 @@ const Header = ({ session }: HeaderProps) => {
                   </div>
               )}
 
-              {/* --- User + Cart (right side) --- */}
               <div className="flex items-center gap-2">
                 {!isMobile ? (
-                    // --- DESKTOP VIEW ---
                     <>
-                      {/* Conditionally render Sign In button or User Menu */}
                       {!user ? (
                           <Button onClick={() => setAuthDialogOpen(true)}>Sign In</Button>
                       ) : (
                           <UserMenu />
                       )}
-                      {/* Cart Button */}
                       <Button variant="ghost" size="icon" className="relative" asChild>
                         <Link href="/cart">
                           <ShoppingCart size={20} />
@@ -131,7 +118,6 @@ const Header = ({ session }: HeaderProps) => {
                       </Button>
                     </>
                 ) : (
-                    // --- MOBILE VIEW ---
                     <Sheet>
                       <SheetTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -146,7 +132,6 @@ const Header = ({ session }: HeaderProps) => {
                           </div>
                           <div className="space-y-3">
                             <Link href="/" className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md">Home</Link>
-                            {/* Conditionally render Sign In link or Account/Sign Out links */}
                             {!user ? (
                                 <div onClick={() => setAuthDialogOpen(true)} className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md cursor-pointer">
                                   <User size={18} /> Sign In
@@ -175,7 +160,6 @@ const Header = ({ session }: HeaderProps) => {
               </div>
             </div>
 
-            {/* --- Mobile search (only visible on mobile) --- */}
             {isMobile && (
                 <div className="mt-3">
                   <div className="relative">
@@ -190,8 +174,11 @@ const Header = ({ session }: HeaderProps) => {
           </div>
         </header>
 
-        {/* Auth Dialog is rendered here, outside the header, controlled by state */}
-        <AuthDialog open={isAuthDialogOpen} onOpenChange={setAuthDialogOpen} />
+        <AuthDialog
+            open={isAuthDialogOpen}
+            onOpenChange={setAuthDialogOpen}
+            onSuccess={() => setAuthDialogOpen(false)}
+        />
       </>
   );
 };

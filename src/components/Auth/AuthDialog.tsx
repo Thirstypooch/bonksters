@@ -14,9 +14,10 @@ import SignUpForm from './SignUpForm';
 interface AuthDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onSuccess?: () => void;
 }
 
-export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
+export default function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
@@ -32,7 +33,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                         <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
                     </TabsList>
                     <TabsContent value="sign-in" className="mt-4">
-                        <SignInForm />
+                        <SignInForm onSuccess={onSuccess} />
                     </TabsContent>
                     <TabsContent value="sign-up" className="mt-4">
                         <SignUpForm />

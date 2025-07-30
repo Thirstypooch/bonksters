@@ -1,15 +1,9 @@
-// Use react-hook-form for state management and Zod for validation, just as the shadcn/ui documentation recommends for its Form component.
-//  import the client. In your form's onSubmit handler, call supabase.auth.signInWithPassword(...) or supabase.auth.signUp(...).
-//
-// Use the toast function from sonner to provide feedback to the user (e.g., "Check your email to verify your account" or "Invalid credentials").
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Github } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -17,7 +11,11 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { TSignInSchema, SignInSchema } from '@/lib/validators/auth';
 
-export default function SignInForm() {
+interface SignInFormProps {
+    onSuccess?: () => void;
+}
+
+export default function SignInForm({ onSuccess }: SignInFormProps) {
     const router = useRouter();
     const form = useForm<TSignInSchema>({
         resolver: zodResolver(SignInSchema),
@@ -37,10 +35,11 @@ export default function SignInForm() {
         if (error) {
             toast.error(error.message);
         } else {
-            // A page refresh will automatically update the session and UI
-            // due to the middleware. The dialog should also be closed here.
             router.refresh();
             toast.success('Signed in successfully!');
+            if (onSuccess) {
+                onSuccess();
+            }
         }
     };
 
