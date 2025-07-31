@@ -2,6 +2,7 @@
 import React from 'react';
 import { MinusCircle, PlusCircle, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 export interface CartItemType {
   id: string;
@@ -26,7 +27,7 @@ const CartItem: React.FC<CartItemProps> = ({
   return (
     <div className="flex gap-4 p-4 border-b border-gray-100">
       <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
-        <img 
+        <Image
           src={item.imageUrl} 
           alt={item.name}
           className="w-full h-full object-cover"

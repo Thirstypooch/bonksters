@@ -2,6 +2,7 @@
 import React from 'react';
 import { ArrowLeft, Star, Clock } from 'lucide-react';
 import Link from "next/link";
+import Image from 'next/image';
 
 interface RestaurantHeaderProps {
   name: string;
@@ -22,7 +23,7 @@ const RestaurantHeader: React.FC<RestaurantHeaderProps> = ({
     <div className="relative">
       {/* Cover Image */}
       <div className="h-48 md:h-64 w-full overflow-hidden">
-        <img
+        <Image
           src={coverImage}
           alt={name}
           className="w-full h-full object-cover"

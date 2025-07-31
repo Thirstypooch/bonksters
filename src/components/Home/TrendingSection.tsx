@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Image from 'next/image';
 
 interface TrendingItemProps {
   id: string;
@@ -36,7 +37,7 @@ const TrendingSection = () => {
             key={item.id}
             className="relative rounded-lg overflow-hidden h-48 group cursor-pointer"
           >
-            <img 
+            <Image
               src={item.imageUrl} 
               alt={item.name} 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Star, Clock } from 'lucide-react';
+import Image from 'next/image';
 
 interface RestaurantCardProps {
   id: string;
@@ -24,7 +25,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
     <Link href={`/restaurant/${id}`} className="block group">
       <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 transition-all hover:shadow-md">
         <div className="h-36 overflow-hidden">
-          <img 
+          <Image
             src={imageUrl} 
             alt={name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform"

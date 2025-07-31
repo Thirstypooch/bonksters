@@ -3,6 +3,7 @@ import React from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/store/cart';
+import Image from 'next/image';
 
 export interface MenuItemType {
   id: string;
@@ -22,7 +23,7 @@ const MenuItem: React.FC<MenuItemType> = (props) => {
   return (
     <div className="flex gap-4 p-3 border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
-        <img 
+        <Image
           src={imageUrl} 
           alt={name}
           className="w-full h-full object-cover"
