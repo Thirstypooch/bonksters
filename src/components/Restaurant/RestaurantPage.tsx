@@ -4,8 +4,7 @@ import React from 'react';
 import RestaurantHeader from '@/components/Restaurant/RestaurantHeader';
 import MenuCategory from '@/components/Restaurant/MenuCategory';
 import CartSummary from '@/components/Restaurant/CartSummary';
-import { trpc } from '@/lib/trpc/client'; // Import tRPC
-import { Skeleton } from '@/components/ui/skeleton';
+import { useCartStore } from '@/lib/store/cart';
 
 const menuCategories = [
     {
@@ -84,26 +83,38 @@ const menuCategories = [
     },
 ];
 
-interface RestaurantPageProps {
+type Restaurant = {
     id: string;
+    name: string;
+    coverImageUrl: string | null;
+    rating: string | null;
+    deliveryTimeMinutes: number | null;
+    deliveryFeeCents: number | null;
 }
 
-const RestaurantPage = ({ id }: RestaurantPageProps) => {
-    const { data: restaurant, isLoading, isError } = trpc.restaurant.getRestaurantById.useQuery({ id });
-    const cartItemCount = 0;
-    const cartTotal = 0;
+type MenuItem = {
+    id: string;
+    name: string;
+    description: string | null;
+    price: number;
+    imageUrl: string | null;
+}
 
-    if (isLoading) {
-        return (
-            <div className="container mx-auto p-6">
-                <Skeleton className="h-64 w-full mb-4" />
-                <Skeleton className="h-10 w-1/2" />
-            </div>
-        );
-    }
-    if (isError || !restaurant) {
-        return <div className="container mx-auto p-6 text-center text-red-500">Restaurant not found or failed to load.</div>;
-    }
+type MenuCategory = {
+    id: string;
+    name: string;
+    items: MenuItem[];
+}
+
+interface RestaurantPageProps {
+    restaurant: Restaurant;
+    menu: MenuCategory[];
+}
+
+const RestaurantPage = ({ restaurant }: RestaurantPageProps) => {
+    const { items } = useCartStore();
+    const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
+    const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
     return (
         <>
@@ -123,7 +134,6 @@ const RestaurantPage = ({ id }: RestaurantPageProps) => {
 
             <div className="container mx-auto px-4 py-6">
                 <div className="flex flex-col md:flex-row gap-6">
-                    {/* Menu Categories (left) */}
                     <aside className="w-full md:w-64 flex-shrink-0">
                         <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden sticky top-20">
                             <div className="p-4">
@@ -143,8 +153,6 @@ const RestaurantPage = ({ id }: RestaurantPageProps) => {
                             </div>
                         </div>
                     </aside>
-
-                    {/* Menu Items (right) */}
                     <div className="flex-grow">
                         <h2 className="text-2xl font-bold mb-6">Menu</h2>
 
@@ -153,7 +161,11 @@ const RestaurantPage = ({ id }: RestaurantPageProps) => {
                                 <MenuCategory
                                     id={category.id}
                                     name={category.name}
-                                    items={category.items}
+                                    items={category.items.map(item => ({
+                                        ...item,
+                                        description: item.description || '',
+                                        imageUrl: item.imageUrl || 'https://placehold.co/300x300/f6f6f7/403e43?text=Item',
+                                    }))}
                                 />
                             </div>
                         ))}
@@ -166,7 +178,7 @@ const RestaurantPage = ({ id }: RestaurantPageProps) => {
                 total={cartTotal}
             />
 
-            {/* Add padding to avoid content being covered by the cart summary */}
+
             {cartItemCount > 0 && <div className="h-16"></div>}
         </>
     );

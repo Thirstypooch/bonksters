@@ -1,7 +1,19 @@
 import RestaurantPage from '@/components/Restaurant/RestaurantPage';
+import { createCaller } from '@/lib/trpc/server';
+import { notFound } from 'next/navigation';
 
-// Making the Page component async aligns its signature with the async RootLayout,
-// which resolves the TypeScript inference issue during the build process.
-export default async function Page({ params }: { params: { id: string } }) {
-  return <RestaurantPage id={params.id} />;
+type PageProps = {
+  params: { id: string };
+};
+
+export default async function Page({ params }: PageProps) {
+  const trpc = createCaller;
+  const restaurant = await trpc.restaurant.getRestaurantById({ id: params.id });
+  const menu = await trpc.restaurant.getMenuByRestaurantId({ id: params.id });
+
+  if (!restaurant) {
+    notFound();
+  }
+
+  return <RestaurantPage restaurant={restaurant} menu={menu} />;
 }
