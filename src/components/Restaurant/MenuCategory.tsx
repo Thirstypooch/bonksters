@@ -9,7 +9,6 @@ interface MenuCategoryProps {
 }
 
 const MenuCategory: React.FC<MenuCategoryProps> = ({
-  id,
   name,
   items
 }) => {

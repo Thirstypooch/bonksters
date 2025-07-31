@@ -1,12 +1,11 @@
-import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { db } from '@/db';
-import {NextRequest} from "next/server"; // Import our Drizzle instance
+import {NextRequest} from "next/server";
 
-export const createContext = async (opts: { req: NextRequest }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createContext = async (_opts: { req: NextRequest }) => {
     return {
-        db, // Make the database connection available in the context
+        db,
     };
 };
 
-// Updated way to infer the context type
 export type Context = Awaited<ReturnType<typeof createContext>>;

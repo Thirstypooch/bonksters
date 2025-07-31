@@ -13,13 +13,13 @@ import SignUpForm from './SignUpForm';
 
 interface AuthDialogProps {
     open: boolean;
-    onOpenChange: (open: boolean) => void;
+    onOpenChangeAction: (open: boolean) => void;
     onSuccess?: () => void;
 }
 
-export default function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
+export default function AuthDialog({ open, onOpenChangeAction, onSuccess }: AuthDialogProps) {
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={onOpenChangeAction}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Authentication</DialogTitle>

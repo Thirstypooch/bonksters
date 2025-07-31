@@ -13,7 +13,7 @@ export interface MenuItemType {
 }
 
 const MenuItem: React.FC<MenuItemType> = (props) => {
-  const { id, name, description, price, imageUrl } = props;
+  const { name, description, price, imageUrl } = props;
   const addItemToCart = useCartStore((state) => state.addItem);
 
   const handleAddItem = () => {

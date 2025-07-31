@@ -20,7 +20,7 @@ export const users = pgTable('users', {
 // Drizzle needs a schema for the built-in auth.users table to establish references
 export const authUsers = pgTable('users', {
     id: uuid('id').primaryKey(),
-}, (table) => {
+}, () => {
     return {
         tableName: 'auth.users', // Explicitly point to the 'auth' schema
     }

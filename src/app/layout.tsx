@@ -61,7 +61,6 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
   return (
     <html lang="en">
-      {/* Apply the font variables to the body tag */}
       <body className={`${nunito.variable} ${poppins.variable} font-sans`}>
       <TRPCProvider>
         <TooltipProvider>

@@ -176,7 +176,7 @@ const Header = ({ user }: HeaderProps) => {
 
         <AuthDialog
             open={isAuthDialogOpen}
-            onOpenChange={setAuthDialogOpen}
+            onOpenChangeAction={setAuthDialogOpen}
             onSuccess={() => setAuthDialogOpen(false)}
         />
       </>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CreditCard, Plus, Trash } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Mock data

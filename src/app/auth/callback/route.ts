@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
     const { searchParams, origin } = new URL(request.url);
@@ -12,15 +13,13 @@ export async function GET(request: NextRequest) {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             {
                 cookies: {
-                    getAll() {
-                        return request.cookies.getAll();
+                    async getAll() {
+                        const cookieStore = await cookies();
+                        return cookieStore.getAll();
                     },
-                    setAll(cookiesToSet) {
-                        cookiesToSet.forEach(({ name, value }) => {
-                            // The response object isn't available in route handlers,
-                            // so we set the cookies on the request object alone.
-                            request.cookies.set(name, value);
-                        });
+                    async setAll(cookiesToSet) {
+                        const cookieStore = await cookies();
+                        cookiesToSet.forEach((cookie) => cookieStore.set(cookie));
                     },
                 },
             }
