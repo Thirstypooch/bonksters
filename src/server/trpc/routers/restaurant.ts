@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 
 export const restaurantRouter = router({
     getRestaurants: publicProcedure.query(async ({ ctx }) => {
-        return await ctx.db.select().from(restaurants);
+        return ctx.db.select().from(restaurants);
     }),
 
     // Procedure to get a single restaurant by its ID
