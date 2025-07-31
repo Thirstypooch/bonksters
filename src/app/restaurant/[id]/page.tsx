@@ -1,11 +1,6 @@
 import RestaurantPage from '@/components/Restaurant/RestaurantPage';
 
-type PageProps = {
-  params: { id: string };
-};
-
-
-export default function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: { id: string } }) {
   return <RestaurantPage id={params.id} />;
 }
 
