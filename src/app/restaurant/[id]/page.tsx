@@ -83,12 +83,8 @@ const menuCategories = [
     },
 ];
 
-interface RestaurantPageProps {
-    params: {
-        id: string;
-    };
-}
-const RestaurantPage = ({ params }: RestaurantPageProps) => {
+
+const RestaurantPage = ({ params }: { params: { id: string } }) => {
     const { id } = params;
     const { data: restaurant, isLoading, isError } = trpc.restaurant.getRestaurantById.useQuery({ id });
     const cartItemCount = 0;
