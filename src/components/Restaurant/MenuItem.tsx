@@ -26,6 +26,8 @@ const MenuItem: React.FC<MenuItemType> = (props) => {
         <Image
           src={imageUrl} 
           alt={name}
+          width={96}
+          height={96}
           className="w-full h-full object-cover"
         />
       </div>

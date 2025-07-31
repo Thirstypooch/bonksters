@@ -78,7 +78,7 @@ const menuCategories = [
                 name: 'Apple Pie',
                 description: 'Warm apple pie with a scoop of vanilla ice cream',
                 price: 6.99,
-                imageUrl: 'https://images.unsplash.com/photo-1568571780765-9276ac8b75a5?w=300',
+                imageUrl: 'https://images.unsplash.com/photo-1535920527002-b35e96722eb9?w=300',
             },
         ],
     },

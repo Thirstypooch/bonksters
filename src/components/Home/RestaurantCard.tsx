@@ -28,6 +28,8 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
           <Image
             src={imageUrl} 
             alt={name}
+            width={500}
+            height={300}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
           />
         </div>

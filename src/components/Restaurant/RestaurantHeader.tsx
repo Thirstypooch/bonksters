@@ -26,6 +26,8 @@ const RestaurantHeader: React.FC<RestaurantHeaderProps> = ({
         <Image
           src={coverImage}
           alt={name}
+          width={1200}
+          height={256}
           className="w-full h-full object-cover"
         />
       </div>
