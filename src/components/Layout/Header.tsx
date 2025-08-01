@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AuthDialog from '../Auth/AuthDialog';
+import Image from 'next/image';
 
 interface HeaderProps {
   user: SupabaseUser | null;
@@ -64,16 +65,19 @@ const Header = ({ user }: HeaderProps) => {
               <div className="flex items-center gap-2">
                 <Link href="/" className="flex items-center">
                   <div className="mr-2 relative">
-                    <div className="h-10 w-10 bg-bonkster-orange rounded-full flex items-center justify-center">
-                      <span className="font-display font-bold text-white text-lg">B</span>
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-bonkster-blue rounded-full flex items-center justify-center">
-                      <span className="font-display font-bold text-white text-xs">!</span>
+                    <div className="h-12 w-12 rounded-full flex items-center justify-center">
+                      <Image
+                          src="/logo.png"
+                          alt="Bonkster's Logo"
+                          width={40}
+                          height={40}
+                          className="rounded-full"
+                      />
                     </div>
                   </div>
                   {!isMobile && (
                       <div className="font-display font-bold text-lg leading-none">
-                        <span className="text-bonkster-orange">Booster&#39;s</span>
+                        <span className="text-bonkster-orange">Bonkster&#39;s</span>
                         <br />
                         <span className="text-bonkster-blue text-sm">Your Food Buddy</span>
                       </div>

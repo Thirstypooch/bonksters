@@ -1,6 +1,7 @@
 
 import React from 'react';
 import Link from "next/link";
+import Image from "next/image";
 
 
 const Footer = () => {
@@ -11,11 +12,14 @@ const Footer = () => {
           <div>
             <Link href="/" className="flex items-center mb-4">
               <div className="mr-2 relative">
-                <div className="h-10 w-10 bg-bonkster-orange rounded-full flex items-center justify-center">
-                  <span className="font-display font-bold text-white text-lg">B</span>
-                </div>
-                <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-bonkster-blue rounded-full flex items-center justify-center">
-                  <span className="font-display font-bold text-white text-xs">!</span>
+                <div className="h-12 w-12 rounded-full flex items-center justify-center">
+                  <Image
+                      src="/logo.png"
+                      alt="Bonkster's Logo"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                  />
                 </div>
               </div>
               <div className="font-display font-bold text-lg leading-none">
