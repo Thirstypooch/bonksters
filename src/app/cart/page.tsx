@@ -22,6 +22,10 @@ const Cart = () => {
   const tax = subtotal * 0.08;
   const total = subtotal + deliveryFee + tax;
 
+  const continueShoppingHref = items.length > 0
+      ? `/restaurant/${items[0].restaurantId}`
+      : '/';
+
   const createOrderMutation = trpc.order.createOrder.useMutation({
     onSuccess: (data) => {
       toast.success(`Order placed successfully! Order ID: ${data.orderId}`);
@@ -65,7 +69,6 @@ const Cart = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
               <div className="p-4 bg-gray-50 border-b border-gray-200">
@@ -89,7 +92,7 @@ const Cart = () => {
                       className="w-full"
                       asChild
                     >
-                      <Link href="/restaurant/1">
+                      <Link href={continueShoppingHref}>
                         + Add More Items
                       </Link>
                     </Button>

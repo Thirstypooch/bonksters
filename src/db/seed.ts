@@ -35,7 +35,7 @@ const RESTAURANTS_TO_SEED = [
         deliveryFeeCents: 0,
         menu: [
             { name: 'Pepperoni Pizza', description: 'Classic pepperoni pizza with mozzarella cheese.', priceCents: 1599, imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300', category: 'Main Course' },
-            { name: 'Garlic Bread', description: 'Toasted bread with garlic butter and herbs.', priceCents: 699, imageUrl: 'https://images.unsplash.com/photo-1588269213882-16c39972a934?w=300', category: 'Appetizers' },
+            { name: 'Garlic Bread', description: 'Toasted bread with garlic butter and herbs.', priceCents: 699, imageUrl:  'https://images.unsplash.com/photo-1623961913233-a65b669115a3?w=300', category: 'Appetizers' },
         ]
     },
     {

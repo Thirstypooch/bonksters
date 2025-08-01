@@ -13,7 +13,17 @@ export const createContext = async (_opts: { req: NextRequest }) => {
                 getAll() {
                     return cookieStore.getAll();
                 },
-            },
+                setAll(cookiesToSet) {
+                    try {
+                        cookiesToSet.forEach(({name, value, options}) => {
+                            cookieStore.set(name, value, options);
+                        });
+                    } catch {
+                        // This will be invoked when a route handler is throwing a redirect or error.
+                        // It's safe to ignore here, as there is no response to set cookies on.
+                    }
+                },
+            }
         }
     );
 
