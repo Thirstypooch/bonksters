@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from "next/link";
 import { useCartStore } from '@/lib/store/cart';
-
+import { trpc } from '@/lib/trpc/client';
+import { toast } from 'sonner';
 
 const Cart = () => {
   const router = useRouter();
-  const { items, removeItem, updateQuantity } = useCartStore();
+  const { items, removeItem, updateQuantity, clearCart } = useCartStore();
   const [promoCode, setPromoCode] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
@@ -20,6 +21,36 @@ const Cart = () => {
   const deliveryFee = 3.99;
   const tax = subtotal * 0.08;
   const total = subtotal + deliveryFee + tax;
+
+  const createOrderMutation = trpc.order.createOrder.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Order placed successfully! Order ID: ${data.orderId}`);
+      clearCart();
+      router.push(`/tracking?orderId=${data.orderId}`);
+    },
+    onError: (error) => {
+      toast.error(`Order failed: ${error.message}`);
+    },
+  });
+
+  const handlePlaceOrder = () => {
+    if (items.length === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
+    if (!agreedToTerms) {
+      toast.warning("Please agree to the terms and conditions.");
+      return;
+    }
+    const restaurantId = items[0].restaurantId;
+
+    createOrderMutation.mutate({
+      cartItems: items.map(item => ({ id: item.id, quantity: item.quantity })),
+      restaurantId: restaurantId,
+      deliveryAddress: '123 Main St, Anytown, USA', // This should come from user's saved addresses
+      deliveryFeeCents: Math.round(deliveryFee * 100),
+    });
+  };
 
   return (
     <>
@@ -154,15 +185,12 @@ const Cart = () => {
                     I agree to terms and conditions
                   </label>
                 </div>
-
                 <Button
-                  className="w-full bg-bonkster-orange hover:bg-bonkster-orange/90"
-                  disabled={!agreedToTerms || items.length === 0}
-                  asChild
+                    className="w-full bg-bonkster-orange hover:bg-bonkster-orange/90"
+                    disabled={!agreedToTerms || items.length === 0 || createOrderMutation.isPending}
+                    onClick={handlePlaceOrder}
                 >
-                  <Link href="/tracking">
-                    Place Order →
-                  </Link>
+                  {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order →'}
                 </Button>
               </div>
             </div>

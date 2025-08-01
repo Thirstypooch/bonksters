@@ -94,13 +94,13 @@ const RestaurantPage = ({ restaurant, menu }: RestaurantPageProps) => {
                                 <MenuCategory
                                     id={category.id}
                                     name={category.name}
-                                    // 4. The `item` here already has `price` in dollars from the tRPC procedure.
-                                    // No need to recalculate from `priceCents`.
                                     items={category.items.map((item): MenuItemType => ({
-                                        ...item,
-                                        price: item.price, // Use the existing price
+                                        id: item.id,
+                                        name: item.name,
+                                        price: item.price,
                                         description: item.description || '',
                                         imageUrl: item.imageUrl || 'https://placehold.co/300x300/f6f6f7/403e43?text=Item',
+                                        restaurantId: item.restaurantId,
                                     }))}
                                 />
                             </div>

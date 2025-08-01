@@ -1,4 +1,4 @@
-
+'use client';
 import React from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ export interface MenuItemType {
   description: string;
   price: number;
   imageUrl: string;
+  restaurantId: string;
 }
 
 const MenuItem: React.FC<MenuItemType> = (props) => {
