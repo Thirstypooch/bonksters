@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Home, CreditCard } from 'lucide-react';
+import { ArrowLeft, CreditCard } from 'lucide-react';
 import CartItem from '@/components/Cart/CartItem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,12 +10,18 @@ import Link from "next/link";
 import { useCartStore } from '@/lib/store/cart';
 import { trpc } from '@/lib/trpc/client';
 import { toast } from 'sonner';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import {Skeleton} from "@/components/ui/skeleton";
 
 const Cart = () => {
   const router = useRouter();
   const { items, removeItem, updateQuantity, clearCart } = useCartStore();
   const [promoCode, setPromoCode] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  const { data: addresses, isLoading: isLoadingAddresses } = trpc.address.getAddresses.useQuery();
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const deliveryFee = 3.99;
@@ -25,6 +31,15 @@ const Cart = () => {
   const continueShoppingHref = items.length > 0
       ? `/restaurant/${items[0].restaurantId}`
       : '/';
+
+  React.useEffect(() => {
+    const defaultAddress = addresses?.find(a => a.isDefault);
+    if (defaultAddress) {
+      setSelectedAddressId(defaultAddress.id);
+    } else if (addresses && addresses.length > 0) {
+      setSelectedAddressId(addresses[0].id);
+    }
+  }, [addresses]);
 
   const createOrderMutation = trpc.order.createOrder.useMutation({
     onSuccess: (data) => {
@@ -38,6 +53,10 @@ const Cart = () => {
   });
 
   const handlePlaceOrder = () => {
+    if (!selectedAddressId) {
+      toast.error("Please select a delivery address.");
+      return;
+    }
     if (items.length === 0) {
       toast.error("Your cart is empty.");
       return;
@@ -46,12 +65,17 @@ const Cart = () => {
       toast.warning("Please agree to the terms and conditions.");
       return;
     }
+    const selectedAddress = addresses?.find(a => a.id === selectedAddressId);
+    if (!selectedAddress) {
+      toast.error("Selected address not found.");
+      return;
+    }
     const restaurantId = items[0].restaurantId;
 
     createOrderMutation.mutate({
       cartItems: items.map(item => ({ id: item.id, quantity: item.quantity })),
       restaurantId: restaurantId,
-      deliveryAddress: '123 Main St, Anytown, USA', // This should come from user's saved addresses
+      deliveryAddress: selectedAddress.fullAddress,
       deliveryFeeCents: Math.round(deliveryFee * 100),
     });
   };
@@ -150,17 +174,28 @@ const Cart = () => {
 
                 <div className="mb-4">
                   <h3 className="font-bold mb-2">Delivery Address</h3>
-                  <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md mb-2">
-                    <div className="flex items-center gap-2">
-                      <Home size={18} className="text-bonkster-blue" />
-                      <span className="font-medium">123 Main St...</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm">Edit</Button>
-                      <Button variant="ghost" size="sm">+ Add New</Button>
-                    </div>
-                  </div>
+                  {isLoadingAddresses ? <Skeleton className="h-24 w-full" /> :
+                      <RadioGroup value={selectedAddressId ?? ""} onValueChange={setSelectedAddressId}>
+                        <div className="space-y-2">
+                          {addresses?.map(address => (
+                              <Label
+                                  key={address.id}
+                                  htmlFor={address.id}
+                                  className="flex items-center gap-4 p-3 border border-gray-200 rounded-md has-[:checked]:border-primary"
+                              >
+                                <RadioGroupItem value={address.id} id={address.id} />
+                                <div>
+                                  <p className="font-medium">{address.label || 'Address'}{address.isDefault && <span className="text-xs text-primary ml-2">(Default)</span>}</p>
+                                  <p className="text-sm text-gray-600">{address.fullAddress}</p>
+                                </div>
+                              </Label>
+                          ))}
+                          {addresses?.length === 0 && <p className="text-sm text-center text-gray-500 p-4">No addresses found. <Link href="/account/addresses" className="text-primary underline">Add one here.</Link></p>}
+                        </div>
+                      </RadioGroup>
+                  }
                 </div>
+
 
                 <div className="mb-4">
                   <h3 className="font-bold mb-2">Payment Method</h3>
