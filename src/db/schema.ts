@@ -6,7 +6,9 @@ import {
     timestamp,
     uuid,
     varchar,
+    boolean as pgBoolean
 } from 'drizzle-orm/pg-core';
+import {relations} from "drizzle-orm";
 
 // Users Table Schema
 export const users = pgTable('users', {
@@ -51,6 +53,15 @@ export const menuItems = pgTable('menu_items', {
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+export const addresses = pgTable('addresses', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    label: varchar('label', { length: 100 }), // e.g., 'Home', 'Work'
+    fullAddress: text('full_address').notNull(), // Combined address field
+    isDefault: pgBoolean('is_default').default(false).notNull(), // <-- Corrected usage
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
 // Orders Table Schema
 export const orders = pgTable('orders', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -70,3 +81,58 @@ export const orderItems = pgTable('order_items', {
     quantity: integer('quantity').notNull(),
     unitPriceCents: integer('unit_price_cents').notNull(),
 });
+
+// --- RELATIONS ---
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+    // A user can have many orders and many addresses
+    orders: many(orders),
+    addresses: many(addresses),
+    // This defines the one-to-one with the auth.users table
+    authUser: one(authUsers, {
+        fields: [users.id],
+        references: [authUsers.id]
+    })
+}));
+
+export const restaurantsRelations = relations(restaurants, ({ many }) => ({
+    // A restaurant can have many menu items and many orders
+    menuItems: many(menuItems),
+    orders: many(orders),
+}));
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+    // An order belongs to one user and one restaurant
+    user: one(users, {
+        fields: [orders.userId],
+        references: [users.id],
+    }),
+    restaurant: one(restaurants, {
+        fields: [orders.restaurantId],
+        references: [restaurants.id],
+    }),
+    // An order can have many order items
+    orderItems: many(orderItems),
+}));
+
+export const menuItemsRelations = relations(menuItems, ({ one, many }) => ({
+    // A menu item belongs to one restaurant
+    restaurant: one(restaurants, {
+        fields: [menuItems.restaurantId],
+        references: [restaurants.id],
+    }),
+    // A menu item can be in many order items
+    orderItems: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+    // An order item belongs to one order and one menu item
+    order: one(orders, {
+        fields: [orderItems.orderId],
+        references: [orders.id],
+    }),
+    menuItem: one(menuItems, {
+        fields: [orderItems.menuItemId],
+        references: [menuItems.id],
+    }),
+}));
