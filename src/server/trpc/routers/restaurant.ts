@@ -2,12 +2,10 @@ import { z } from 'zod';
 import { Redis } from '@upstash/redis';
 import { publicProcedure, router } from '../trpc';
 import { menuItems, restaurants } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
 
 const redis = Redis.fromEnv();
 
-// --- DEFINE THE CORRECT RETURN TYPE ---
-// This defines the shape of a single transformed menu item
 type TransformedMenuItem = {
     id: string;
     name: string;
@@ -21,7 +19,6 @@ type TransformedMenuItem = {
     updatedAt: Date | null;
 }
 
-// This defines the shape of the final data structure that is returned and cached.
 type MenuReturnType = {
     id: string;
     name: string;
@@ -55,10 +52,9 @@ export const restaurantRouter = router({
 
     getMenuByRestaurantId: publicProcedure
         .input(z.object({ id: z.string().uuid('Invalid UUID') }))
-        .query(async ({ ctx, input }): Promise<MenuReturnType> => { // We can also type the function's return promise
+        .query(async ({ ctx, input }): Promise<MenuReturnType> => {
             const cacheKey = `menu:${input.id}`;
 
-            // Use our correctly defined type to tell TypeScript what to expect from the cache
             const cached = await redis.get<MenuReturnType>(cacheKey);
             if (cached) {
                 console.log(`CACHE HIT: menu:${input.id}`);
@@ -89,5 +85,29 @@ export const restaurantRouter = router({
 
             await redis.set(cacheKey, freshData, { ex: 1800 });
             return freshData;
+        }),
+
+    searchRestaurants: publicProcedure
+        .input(
+            z.object({
+                query: z.string(),
+            })
+        )
+        .query(async ({ ctx, input }) => {
+            if (input.query.length < 2) {
+                return [];
+            }
+
+            const searchResults = await ctx.db
+                .select({
+                    id: restaurants.id,
+                    name: restaurants.name,
+                    coverImageUrl: restaurants.coverImageUrl,
+                })
+                .from(restaurants)
+                .where(ilike(restaurants.name, `%${input.query}%`))
+                .limit(8);
+
+            return searchResults;
         }),
 });

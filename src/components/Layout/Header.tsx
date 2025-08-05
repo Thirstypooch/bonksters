@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MapPin, Search, ShoppingCart, User, Menu, LogOut } from 'lucide-react';
+import { MapPin, Search, ShoppingCart, User, Menu, LogOut, Loader2 } from 'lucide-react';
 import { type User as SupabaseUser } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,7 +14,11 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AuthDialog from '../Auth/AuthDialog';
+import { useDebounce } from '@/hooks/use-debounce';
+import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useCartStore } from '@/lib/store/cart';
 
 interface HeaderProps {
   user: SupabaseUser | null;
@@ -25,7 +29,27 @@ const Header = ({ user }: HeaderProps) => {
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const router = useRouter();
-  const cartItemCount = 0;
+  const cartItems = useCartStore((state) => state.items);
+  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isPopoverOpen, setPopoverOpen]= useState(false)
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+
+  const { data: searchResults, isLoading: isSearchLoading }= trpc.restaurant.searchRestaurants.useQuery(
+      { query : debouncedSearchQuery},
+      {
+        enabled: debouncedSearchQuery.length > 1
+      }
+  );
+
+  useEffect(() => {
+    if(debouncedSearchQuery.length > 1) {
+      setPopoverOpen(true)
+    } else {
+      setPopoverOpen(false)
+    }
+  }, [debouncedSearchQuery, searchResults])
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -92,13 +116,28 @@ const Header = ({ user }: HeaderProps) => {
               </div>
               {!isMobile && (
                   <div className="flex-1 max-w-md mx-4">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                      <Input
-                          placeholder="Search restaurants or dishes..."
-                          className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-full"
-                      />
-                    </div>
+                    <Popover open={isPopoverOpen} onOpenChange={setPopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          <Input
+                              placeholder="Search restaurants or dishes..."
+                              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-full"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              onFocus={() => { if (searchQuery.length > 1) setPopoverOpen(true); }}
+                          />
+                        </div>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                        {/* Popover content logic is the same */}
+                        <div className="flex flex-col gap-1 p-2">
+                          {isSearchLoading && ( <div className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /><span>Searching...</span></div> )}
+                          {!isSearchLoading && searchResults && searchResults.length > 0 && ( searchResults.map((restaurant) => ( <Link key={restaurant.id} href={`/restaurant/${restaurant.id}`} onClick={() => { setSearchQuery(''); setPopoverOpen(false); }} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100"> <Image src={restaurant.coverImageUrl || 'https://placehold.co/40x40'} alt={restaurant.name} width={40} height={40} className="rounded-md object-cover h-10 w-10" /> <span className="font-medium text-sm">{restaurant.name}</span> </Link> )))}
+                          {!isSearchLoading && (!searchResults || searchResults.length === 0) && debouncedSearchQuery.length > 1 && ( <div className="px-4 py-2 text-sm text-center text-gray-500">No results found for &quot;{debouncedSearchQuery}&quot;</div> )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
               )}
 
@@ -163,16 +202,30 @@ const Header = ({ user }: HeaderProps) => {
                 )}
               </div>
             </div>
-
             {isMobile && (
                 <div className="mt-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                    <Input
-                        placeholder="Search restaurants or dishes..."
-                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-full"
-                    />
-                  </div>
+                  <Popover open={isPopoverOpen} onOpenChange={setPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                        <Input
+                            placeholder="Search restaurants..."
+                            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-full"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => { if (searchQuery.length > 1) setPopoverOpen(true); }}
+                        />
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                      {/* Popover content logic is the same */}
+                      <div className="flex flex-col gap-1 p-2">
+                        {isSearchLoading && ( <div className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /><span>Searching...</span></div> )}
+                        {!isSearchLoading && searchResults && searchResults.length > 0 && ( searchResults.map((restaurant) => ( <Link key={restaurant.id} href={`/restaurant/${restaurant.id}`} onClick={() => { setSearchQuery(''); setPopoverOpen(false); }} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100"> <Image src={restaurant.coverImageUrl || 'https://placehold.co/40x40'} alt={restaurant.name} width={40} height={40} className="rounded-md object-cover h-10 w-10" /> <span className="font-medium text-sm">{restaurant.name}</span> </Link> )))}
+                        {!isSearchLoading && (!searchResults || searchResults.length === 0) && debouncedSearchQuery.length > 1 && ( <div className="px-4 py-2 text-sm text-center text-gray-500">No results found for &quot;{debouncedSearchQuery}&quot;</div> )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
             )}
           </div>
