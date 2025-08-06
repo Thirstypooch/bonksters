@@ -23,7 +23,7 @@ const RESTAURANTS_TO_SEED = [
         deliveryFeeCents: 599,
         menu: [
             { name: 'Classic Burger', description: 'Beef patty with lettuce, tomato, onion, and our special sauce', priceCents: 1299, imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300', category: 'Main Course' },
-            { name: 'Loaded Fries', description: 'French fries topped with cheese, bacon, and green onions', priceCents: 899, imageUrl: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300', category: 'Appetizers' },
+            { name: 'Loaded Fries', description: 'French fries topped with cheese, bacon, and green onions', priceCents: 899, imageUrl: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=300', category: 'Appetizers' },
             { name: 'Chocolate Shake', description: 'Rich and creamy chocolate milkshake topped with whipped cream', priceCents: 599, imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300', category: 'Desserts' },
         ]
     },
@@ -35,7 +35,7 @@ const RESTAURANTS_TO_SEED = [
         deliveryFeeCents: 0,
         menu: [
             { name: 'Pepperoni Pizza', description: 'Classic pepperoni pizza with mozzarella cheese.', priceCents: 1599, imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300', category: 'Main Course' },
-            { name: 'Garlic Bread', description: 'Toasted bread with garlic butter and herbs.', priceCents: 699, imageUrl: 'https://images.unsplash.com/photo-1588269213882-16c39972a934?w=300', category: 'Appetizers' },
+            { name: 'Garlic Bread', description: 'Toasted bread with garlic butter and herbs.', priceCents: 699, imageUrl: 'https://images.unsplash.com/photo-1619894991209-9f9694be045a?w=300', category: 'Appetizers' },
         ]
     },
     {
@@ -46,7 +46,7 @@ const RESTAURANTS_TO_SEED = [
         deliveryFeeCents: 399,
         menu: [
             { name: 'California Roll', description: 'Crab, avocado, and cucumber.', priceCents: 999, imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300', category: 'Sushi' },
-            { name: 'Miso Soup', description: 'Traditional Japanese soup with tofu and seaweed.', priceCents: 399, imageUrl: 'https://images.unsplash.com/photo-1615361200141-f45040f367be?w=300', category: 'Appetizers' },
+            { name: 'Miso Soup', description: 'Traditional Japanese soup with tofu and seaweed.', priceCents: 399, imageUrl: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=300', category: 'Appetizers' },
         ]
     },
     {
@@ -57,7 +57,40 @@ const RESTAURANTS_TO_SEED = [
         deliveryFeeCents: 299,
         menu: [
             { name: 'Carne Asada Tacos', description: 'Three grilled steak tacos with onion and cilantro.', priceCents: 1399, imageUrl: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300', category: 'Main Course' },
-            { name: 'Chips and Guacamole', description: 'Freshly made guacamole with tortilla chips.', priceCents: 799, imageUrl: 'https://images.unsplash.com/photo-1548483689-326b52a35a68?w=300', category: 'Appetizers' },
+            { name: 'Chips and Guacamole', description: 'Freshly made guacamole with tortilla chips.', priceCents: 799, imageUrl: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=300', category: 'Appetizers' },
+        ]
+    },
+    {
+        name: 'The Green Bowl',
+        coverImageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&h=300&fit=crop',
+        rating: '4.70',
+        deliveryTimeMinutes: 20,
+        deliveryFeeCents: 450,
+        menu: [
+            { name: 'Quinoa Power Bowl', description: 'A vibrant mix of quinoa, roasted sweet potatoes, avocado, and kale.', priceCents: 1450, imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300', category: 'Vegan' },
+            { name: 'Lentil Soup', description: 'Hearty and warming lentil soup, served with a slice of sourdough.', priceCents: 750, imageUrl: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=300', category: 'Appetizers' },
+        ]
+    },
+    {
+        name: 'Morning Eats',
+        coverImageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500&h=300&fit=crop',
+        rating: '4.60',
+        deliveryTimeMinutes: 25,
+        deliveryFeeCents: 300,
+        menu: [
+            { name: 'Pancake Stack', description: 'Fluffy buttermilk pancakes served with maple syrup and fresh berries.', priceCents: 1199, imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=300', category: 'Breakfast' },
+            { name: 'Avocado Toast', description: 'Smashed avocado on toasted sourdough, topped with chili flakes.', priceCents: 950, imageUrl: 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=300', category: 'Breakfast' },
+        ]
+    },
+    {
+        name: 'Biryani House',
+        coverImageUrl: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8da7?w=500&h=300&fit=crop',
+        rating: '4.90',
+        deliveryTimeMinutes: 45,
+        deliveryFeeCents: 150,
+        menu: [
+            { name: 'Chicken Dum Biryani', description: 'Aromatic basmati rice cooked with chicken and exotic spices.', priceCents: 1899, imageUrl: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300', category: 'Biryani' },
+            { name: 'Vegetable Samosas', description: 'Crispy pastry filled with spiced potatoes and peas.', priceCents: 650, imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=300', category: 'Appetizers' },
         ]
     }
 ];

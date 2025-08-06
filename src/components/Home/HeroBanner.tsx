@@ -2,8 +2,13 @@
 import React from 'react';
 
 const HeroBanner = () => {
+    const bannerImageUrl = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1920&auto=format&fit=crop';
   return (
-    <div className="relative bg-bonkster-orange overflow-hidden rounded-lg shadow-md mb-6">
+      <div
+          className="relative bg-cover bg-center overflow-hidden rounded-lg shadow-md mb-6"
+          style={{ backgroundImage: `url(${bannerImageUrl})` }}
+      >
+          <div className="absolute inset-0 bg-black/50"></div>
       <div className="container mx-auto px-4 py-8 md:py-12 relative z-10">
         <div className="max-w-md">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-4">
