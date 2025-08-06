@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MapPin, Search, ShoppingCart, User, Menu, LogOut, Loader2 } from 'lucide-react';
@@ -19,18 +19,42 @@ import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCartStore } from '@/lib/store/cart';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface HeaderProps {
   user: SupabaseUser | null;
 }
 
 const Header = ({ user }: HeaderProps) => {
-  const [location] = useState('Current Location');
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const router = useRouter();
   const cartItems = useCartStore((state) => state.items);
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const { data: addresses, isLoading: isLoadingAddresses } = trpc.address.getAddresses.useQuery(
+      undefined,
+      {
+        enabled: !!user,
+      }
+  );
+
+  const displayLocation = useMemo(() => {
+    if (!user) {
+      return 'Current Location';
+    }
+    if (isLoadingAddresses) {
+      return '';
+    }
+    const defaultAddress = addresses?.find(addr => addr.isDefault);
+    if (defaultAddress) {
+      return defaultAddress.label || 'Default Address';
+    }
+    if (addresses && addresses.length > 0) {
+      return addresses[0].label || 'Saved Address';
+    }
+    return 'Set a Location';
+  }, [user, addresses, isLoadingAddresses]);
 
   const [searchQuery, setSearchQuery] = useState('')
   const [isPopoverOpen, setPopoverOpen]= useState(false)
@@ -110,7 +134,11 @@ const Header = ({ user }: HeaderProps) => {
                 {!isMobile && (
                     <div className="ml-4 flex items-center text-sm border border-gray-300 rounded-full px-3 py-1 cursor-pointer hover:bg-gray-50">
                       <MapPin size={16} className="text-bonkster-orange mr-1" />
-                      <span className="truncate max-w-[150px]">{location}</span>
+                      {isLoadingAddresses && !!user ? (
+                          <Skeleton className="h-4 w-24" />
+                      ) : (
+                          <span className="truncate max-w-[150px]">{displayLocation}</span>
+                      )}
                     </div>
                 )}
               </div>
@@ -130,17 +158,48 @@ const Header = ({ user }: HeaderProps) => {
                         </div>
                       </PopoverTrigger>
                       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                        {/* Popover content logic is the same */}
                         <div className="flex flex-col gap-1 p-2">
                           {isSearchLoading && ( <div className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /><span>Searching...</span></div> )}
-                          {!isSearchLoading && searchResults && searchResults.length > 0 && ( searchResults.map((restaurant) => ( <Link key={restaurant.id} href={`/restaurant/${restaurant.id}`} onClick={() => { setSearchQuery(''); setPopoverOpen(false); }} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100"> <Image src={restaurant.coverImageUrl || 'https://placehold.co/40x40'} alt={restaurant.name} width={40} height={40} className="rounded-md object-cover h-10 w-10" /> <span className="font-medium text-sm">{restaurant.name}</span> </Link> )))}
-                          {!isSearchLoading && (!searchResults || searchResults.length === 0) && debouncedSearchQuery.length > 1 && ( <div className="px-4 py-2 text-sm text-center text-gray-500">No results found for &quot;{debouncedSearchQuery}&quot;</div> )}
+                          {!isSearchLoading && searchResults && searchResults.length > 0 && (
+                              searchResults.map((restaurant) => (
+                                  <Link
+                                      key={restaurant.id}
+                                      href={`/restaurant/${restaurant.id}`}
+                                      onClick={() => {
+                                        setSearchQuery('');
+                                        setPopoverOpen(false);
+                                      }}
+                                      className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100"
+                                  >
+                                    <Image
+                                        src={restaurant.coverImageUrl || 'https://placehold.co/40x40'}
+                                        alt={restaurant.name ?? 'Restaurant'}
+                                        width={40}
+                                        height={40}
+                                        className="rounded-md object-cover h-10 w-10"
+                                    />
+                                    <div className="flex flex-col">
+                                      <span className="font-medium text-sm">{restaurant.name}</span>
+                                      {restaurant.matchedOn && restaurant.matchedOn.toLowerCase() !== restaurant.name?.toLowerCase() && (
+                                          <span className="text-xs text-gray-500 truncate">
+
+                                            Found: &quot;{restaurant.matchedOn}&quot;
+                                      </span>
+                                      )}
+                                    </div>
+                                  </Link>
+                              ))
+                          )}
+                          {!isSearchLoading && (!searchResults || searchResults.length === 0) && debouncedSearchQuery.length > 1 && (
+                              <div className="px-4 py-2 text-sm text-center text-gray-500">
+                                No results found for &quot;{debouncedSearchQuery}&quot;
+                              </div>
+                          )}
                         </div>
                       </PopoverContent>
                     </Popover>
                   </div>
               )}
-
               <div className="flex items-center gap-2">
                 {!isMobile ? (
                     <>
@@ -171,7 +230,11 @@ const Header = ({ user }: HeaderProps) => {
                         <div className="flex flex-col gap-6 pt-6">
                           <div className="flex items-center gap-2 px-2">
                             <MapPin size={18} className="text-bonkster-orange" />
-                            <span className="text-sm">{location}</span>
+                            {isLoadingAddresses && !!user ? (
+                                <Skeleton className="h-4 w-24" />
+                            ) : (
+                                <span className="text-sm">{displayLocation}</span>
+                            )}
                           </div>
                           <div className="space-y-3">
                             <Link href="/" className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md">Home</Link>
@@ -218,11 +281,42 @@ const Header = ({ user }: HeaderProps) => {
                       </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                      {/* Popover content logic is the same */}
                       <div className="flex flex-col gap-1 p-2">
                         {isSearchLoading && ( <div className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /><span>Searching...</span></div> )}
-                        {!isSearchLoading && searchResults && searchResults.length > 0 && ( searchResults.map((restaurant) => ( <Link key={restaurant.id} href={`/restaurant/${restaurant.id}`} onClick={() => { setSearchQuery(''); setPopoverOpen(false); }} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100"> <Image src={restaurant.coverImageUrl || 'https://placehold.co/40x40'} alt={restaurant.name} width={40} height={40} className="rounded-md object-cover h-10 w-10" /> <span className="font-medium text-sm">{restaurant.name}</span> </Link> )))}
-                        {!isSearchLoading && (!searchResults || searchResults.length === 0) && debouncedSearchQuery.length > 1 && ( <div className="px-4 py-2 text-sm text-center text-gray-500">No results found for &quot;{debouncedSearchQuery}&quot;</div> )}
+                        {!isSearchLoading && searchResults && searchResults.length > 0 && (
+                            searchResults.map((restaurant) => (
+                                <Link
+                                    key={restaurant.id}
+                                    href={`/restaurant/${restaurant.id}`}
+                                    onClick={() => {
+                                      setSearchQuery('');
+                                      setPopoverOpen(false);
+                                    }}
+                                    className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100"
+                                >
+                                  <Image
+                                      src={restaurant.coverImageUrl || 'https://placehold.co/40x40'}
+                                      alt={restaurant.name ?? 'Restaurant'}
+                                      width={40}
+                                      height={40}
+                                      className="rounded-md object-cover h-10 w-10"
+                                  />
+                                  <div className="flex flex-col">
+                                    <span className="font-medium text-sm">{restaurant.name}</span>
+                                    {restaurant.matchedOn && restaurant.matchedOn.toLowerCase() !== restaurant.name?.toLowerCase() && (
+                                        <span className="text-xs text-gray-500 truncate">
+                                          Found: &quot;{restaurant.matchedOn}&quot;
+                                        </span>
+                                    )}
+                                  </div>
+                                </Link>
+                            ))
+                        )}
+                        {!isSearchLoading && (!searchResults || searchResults.length === 0) && debouncedSearchQuery.length > 1 && (
+                            <div className="px-4 py-2 text-sm text-center text-gray-500">
+                              No results found for &quot;{debouncedSearchQuery}&quot;
+                            </div>
+                        )}
                       </div>
                     </PopoverContent>
                   </Popover>

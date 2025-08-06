@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { Redis } from '@upstash/redis';
 import { publicProcedure, router } from '../trpc';
 import { menuItems, restaurants } from '@/db/schema';
-import { eq, ilike } from 'drizzle-orm';
+import {eq, ilike, or, sql} from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core'
 
 const redis = Redis.fromEnv();
 
@@ -98,16 +99,30 @@ export const restaurantRouter = router({
                 return [];
             }
 
+            const query = `%${input.query}%`;
+
+            const searchMenuItems = alias(menuItems, 'search_menu_items');
+
             const searchResults = await ctx.db
-                .select({
+                .selectDistinctOn([restaurants.id], {
                     id: restaurants.id,
                     name: restaurants.name,
                     coverImageUrl: restaurants.coverImageUrl,
+                    matchedOn: sql<string>`
+                        CASE
+                            WHEN ${restaurants.name} ILIKE ${query} THEN ${restaurants.name}
+                            ELSE ${searchMenuItems.name}
+                        END
+                    `.as('matched_on')
                 })
                 .from(restaurants)
-                .where(ilike(restaurants.name, `%${input.query}%`))
+                .leftJoin(searchMenuItems, eq(restaurants.id, searchMenuItems.restaurantId))
+                .where( or(
+                    ilike(restaurants.name, query),
+                    ilike(searchMenuItems.name, query)
+                ))
                 .limit(8);
 
-            return searchResults;
+            return searchResults.filter(r => r.id);
         }),
 });
