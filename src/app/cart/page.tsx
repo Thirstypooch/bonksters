@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import {Skeleton} from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 
 const Cart = () => {
   const router = useRouter();
@@ -32,6 +34,8 @@ const Cart = () => {
       ? `/restaurant/${items[0].restaurantId}`
       : '/';
 
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
   React.useEffect(() => {
     const defaultAddress = addresses?.find(a => a.isDefault);
     if (defaultAddress) {
@@ -41,11 +45,14 @@ const Cart = () => {
     }
   }, [addresses]);
 
-  const createOrderMutation = trpc.order.createOrder.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Order placed successfully! Order ID: ${data.orderId}`);
-      clearCart();
-      router.push(`/tracking?orderId=${data.orderId}`);
+  const createCheckoutSessionMutation = trpc.order.createCheckoutSession.useMutation({
+    onSuccess: ({ url }) => {
+      if (url) {
+        clearCart();
+        router.push(url);
+      } else {
+        toast.error("Could not redirect to payment. Please try again.");
+      }
     },
     onError: (error) => {
       toast.error(`Order failed: ${error.message}`);
@@ -72,7 +79,7 @@ const Cart = () => {
     }
     const restaurantId = items[0].restaurantId;
 
-    createOrderMutation.mutate({
+    createCheckoutSessionMutation.mutate({
       cartItems: items.map(item => ({ id: item.id, quantity: item.quantity })),
       restaurantId: restaurantId,
       deliveryAddress: selectedAddress.fullAddress,
@@ -141,6 +148,15 @@ const Cart = () => {
               </div>
 
               <div className="p-4">
+                {isDemoMode && (
+                    <Alert className="mb-4 bg-blue-50 border-blue-200">
+                      <Info className="h-4 w-4 text-blue-600" />
+                      <AlertTitle className="font-bold text-blue-800">Demo Mode</AlertTitle>
+                      <AlertDescription className="text-blue-700">
+                        Payment details are pre-filled with a test card. Just click &#34;Pay now&#34; on the next screen to complete the demo.
+                      </AlertDescription>
+                    </Alert>
+                )}
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal</span>
@@ -205,9 +221,6 @@ const Cart = () => {
                       <span className="font-medium">Card **** 1234</span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Use PayPal
-                  </Button>
                 </div>
 
                 <div className="mb-4 flex items-center gap-2">
@@ -225,10 +238,10 @@ const Cart = () => {
                 </div>
                 <Button
                     className="w-full bg-bonkster-orange hover:bg-bonkster-orange/90"
-                    disabled={!agreedToTerms || items.length === 0 || createOrderMutation.isPending}
+                    disabled={!agreedToTerms || items.length === 0 || createCheckoutSessionMutation.isPending}
                     onClick={handlePlaceOrder}
                 >
-                  {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order →'}
+                  {createCheckoutSessionMutation.isPending ? 'Processing...' : 'Proceed to Payment →'}
                 </Button>
               </div>
             </div>

@@ -11,7 +11,11 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { TSignUpSchema, SignUpSchema } from '@/lib/validators/auth';
 
-export default function SignUpForm() {
+interface SignUpFormProps {
+    onSuccess?: () => void;
+}
+
+export default function SignUpForm({ onSuccess }: SignUpFormProps) {
     const form = useForm<TSignUpSchema>({
         resolver: zodResolver(SignUpSchema),
         defaultValues: {
@@ -25,7 +29,6 @@ export default function SignUpForm() {
         const { error } = await supabase.auth.signUp({
             email: data.email,
             password: data.password,
-            // Options can be added here, like redirecting after sign up
         });
 
         if (error) {
@@ -35,6 +38,9 @@ export default function SignUpForm() {
                 description: 'We sent you a verification link. Please confirm your email to sign in.',
             });
             form.reset();
+            if (onSuccess) {
+                onSuccess();
+            }
         }
     };
 

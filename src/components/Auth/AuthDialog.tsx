@@ -10,16 +10,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
+import { useAuthDialogStore } from '@/lib/store/authDialog';
 
-interface AuthDialogProps {
-    open: boolean;
-    onOpenChangeAction: (open: boolean) => void;
-    onSuccess?: () => void;
-}
-
-export default function AuthDialog({ open, onOpenChangeAction, onSuccess }: AuthDialogProps) {
+export default function AuthDialog() {
+    const {isOpen, close} = useAuthDialogStore();
     return (
-        <Dialog open={open} onOpenChange={onOpenChangeAction}>
+        <Dialog open={isOpen} onOpenChange={(open) => {
+            if (!open) close();
+        }}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Authentication</DialogTitle>
@@ -33,10 +31,10 @@ export default function AuthDialog({ open, onOpenChangeAction, onSuccess }: Auth
                         <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
                     </TabsList>
                     <TabsContent value="sign-in" className="mt-4">
-                        <SignInForm onSuccess={onSuccess} />
+                        <SignInForm onSuccess={close}/>
                     </TabsContent>
                     <TabsContent value="sign-up" className="mt-4">
-                        <SignUpForm />
+                        <SignUpForm onSuccess={close}/>
                     </TabsContent>
                 </Tabs>
             </DialogContent>

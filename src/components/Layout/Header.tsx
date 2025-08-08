@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AuthDialog from '../Auth/AuthDialog';
+import { useAuthDialogStore } from '@/lib/store/authDialog';
 import { useDebounce } from '@/hooks/use-debounce';
 import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
@@ -26,11 +27,11 @@ interface HeaderProps {
 }
 
 const Header = ({ user }: HeaderProps) => {
-  const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const router = useRouter();
   const cartItems = useCartStore((state) => state.items);
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const openAuthDialog = useAuthDialogStore((state) => state.open);
 
   const { data: addresses, isLoading: isLoadingAddresses } = trpc.address.getAddresses.useQuery(
       undefined,
@@ -204,7 +205,7 @@ const Header = ({ user }: HeaderProps) => {
                 {!isMobile ? (
                     <>
                       {!user ? (
-                          <Button onClick={() => setAuthDialogOpen(true)}>Sign In</Button>
+                          <Button onClick={openAuthDialog}>Sign In</Button>
                       ) : (
                           <UserMenu />
                       )}
@@ -239,7 +240,7 @@ const Header = ({ user }: HeaderProps) => {
                           <div className="space-y-3">
                             <Link href="/" className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md">Home</Link>
                             {!user ? (
-                                <div onClick={() => setAuthDialogOpen(true)} className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md cursor-pointer">
+                                <div onClick={(openAuthDialog)} className="flex items-center gap-3 px-2 py-3 hover:bg-gray-100 rounded-md cursor-pointer">
                                   <User size={18} /> Sign In
                                 </div>
                             ) : (
@@ -325,11 +326,7 @@ const Header = ({ user }: HeaderProps) => {
           </div>
         </header>
 
-        <AuthDialog
-            open={isAuthDialogOpen}
-            onOpenChangeAction={setAuthDialogOpen}
-            onSuccess={() => setAuthDialogOpen(false)}
-        />
+        <AuthDialog/>
       </>
   );
 };
