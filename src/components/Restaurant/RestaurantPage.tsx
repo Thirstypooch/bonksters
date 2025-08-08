@@ -1,11 +1,12 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import RestaurantHeader from '@/components/Restaurant/RestaurantHeader';
 import MenuCategory from '@/components/Restaurant/MenuCategory';
 import CartSummary from '@/components/Restaurant/CartSummary';
 import { useCartStore } from '@/lib/store/cart';
 import { type MenuItemType } from '@/components/Restaurant/MenuItem';
+import {toast} from "sonner";
 
 // Define types that match the data coming from the tRPC procedure
 type Restaurant = {
@@ -41,11 +42,30 @@ interface RestaurantPageProps {
 }
 
 const RestaurantPage = ({ restaurant, menu }: RestaurantPageProps) => {
-    // 1. 'addItem' is not used here, so we remove it.
-    const { items: cartItems } = useCartStore();
+    const { items: cartItems, clearCart, removeItem } = useCartStore();
+
+    useEffect(() => {
+        if (cartItems.length > 0) {
+            const isDifferentRestaurant = cartItems.some(item => item.restaurantId !== restaurant.id);
+            if (isDifferentRestaurant) {
+                console.warn("Cart contains items from a different restaurant. Clearing cart.");
+                clearCart();
+                toast.info("Your cart was cleared as you switched to a new restaurant.");
+                return;
+            }
+
+            const validMenuItemIds = new Set(menu.flatMap(category => category.items.map(item => item.id)));
+            const itemsToRemove = cartItems.filter(cartItem => !validMenuItemIds.has(cartItem.id));
+
+            if (itemsToRemove.length > 0) {
+                console.warn("Found stale items in cart. Removing them.", itemsToRemove);
+                itemsToRemove.forEach(item => removeItem(item.id));
+                toast.warning("Some items in your cart were no longer available in the current session and have been removed.");
+            }
+        }
+    }, [restaurant.id, menu, cartItems, clearCart, removeItem]);
 
     const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-    // 2. The CartItem type uses 'price' (in dollars), not 'priceCents'.
     const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
     return (

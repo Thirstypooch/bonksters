@@ -68,7 +68,8 @@ export const orders = pgTable('orders', {
     userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'set null' }),
     restaurantId: uuid('restaurant_id').notNull().references(() => restaurants.id, { onDelete: 'set null' }),
     totalCents: integer('total_cents').notNull(),
-    status: varchar('status', { length: 50 }).notNull().default('confirmed'),
+    status: varchar('status', { length: 50 }).notNull().default('pending'),
+    stripePaymentIntentId: varchar('stripe_payment_intent_id', { length: 255 }),
     deliveryAddress: text('delivery_address'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });

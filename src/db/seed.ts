@@ -84,7 +84,7 @@ const RESTAURANTS_TO_SEED = [
     },
     {
         name: 'Biryani House',
-        coverImageUrl: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8da7?w=500&h=300&fit=crop',
+        coverImageUrl: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&h=300&fit=crop',
         rating: '4.90',
         deliveryTimeMinutes: 45,
         deliveryFeeCents: 150,
